@@ -67,8 +67,6 @@ class MsdnView : Window {
 		Tree t = MsdnClient.OpenTree ("/library/en-us/toc/msdnlib/top.xml");
 		
 		foreach (TreeNode n in t.Children) {
-			t.RemoveChild (n);
-	
 			Store.AddNode (n);
 			n.EnsureNoFakeLeafs ();
 		}
