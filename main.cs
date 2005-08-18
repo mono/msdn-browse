@@ -14,7 +14,7 @@ class MsdnView : Window {
 
 	public MsdnView () : base ("Msdn View")
 	{	
-		DefaultSize = new Gdk.Size (640,480);
+		DefaultSize = new Gdk.Size (1024,1024);
 
 		HPaned hb = new HPaned ();
 	
@@ -24,6 +24,7 @@ class MsdnView : Window {
 		NodeView view = new NodeView (Store);	
 		view.HeadersVisible = false;
 		view.AppendColumn ("Name", new CellRendererText (), "text", 0);	
+		sw.WidthRequest = 300;
 		InitTree ();
 		Add (hb);
 		hb.Add (sw);
