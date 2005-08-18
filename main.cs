@@ -6,6 +6,7 @@ using System.Net;
 using Gtk;
 using System.Collections;
 using Gecko;
+using System.Threading;
 
 class MsdnView : Window {
 	NodeStore Store;
@@ -57,6 +58,10 @@ class MsdnView : Window {
 		};
 	
 		view.RowExpanded += delegate (object o, RowExpandedArgs args) {
+			while (Application.EventsPending ())
+				Application.RunIteration ();
+			// Pretend you are using a 56k connection ;-)
+			// Thread.Sleep (1000);
 			TreeNode n = (TreeNode) Store.GetNode (args.Path);
 			n.PopulateChildren ();
 		};
@@ -106,6 +111,9 @@ class MsdnClient {
 }
 
 public class DummyNode : TreeNode {
+	public DummyNode () {
+		Title = "Loading...";
+	}
 }
 
 public class Tree : TreeNode {
