@@ -31,8 +31,8 @@ class MsdnView : Window {
 		hb.Add (sw);
 		hb.Add (wc);
 		sw.Add (view);
+		
 		// Events
-
 		DeleteEvent += delegate {
 			Application.Quit ();
 		};
@@ -56,16 +56,13 @@ class MsdnView : Window {
 			wc.CloseStream ();
 
 		};
-	
-		view.RowExpanded += delegate (object o, RowExpandedArgs args) {
-			TreeNode n = (TreeNode) Store.GetNode (args.Path);
-			n.PopulateChildrenAsync ();
-		};
+
+		Store.ConnectLazyLoad (view);
 	}
 
 	void InitTree ()
 	{
-		Tree t = MsdnClient.OpenTree ("/library/en-us/toc/msdnlib/top.xml");
+		Tree t = Tree.GetDefault ();
 		
 		foreach (TreeNode n in t.Children) {
 			Store.AddNode (n);
@@ -116,6 +113,10 @@ public class DummyNode : TreeNode {
 }
 
 public class Tree : TreeNode {
+	public static Tree GetDefault ()
+	{
+		return MsdnClient.OpenTree ("/library/en-us/toc/msdnlib/top.xml");
+	}
 }
 
 public class TreeNode : Gtk.TreeNode {
@@ -151,6 +152,14 @@ public class TreeNode : Gtk.TreeNode {
 		}
 	}
 
+	public void ConnectLazyLoad (NodeView nv)
+	{
+		nv.RowExpanded += delegate (object o, RowExpandedArgs args) {
+			TreeNode n = (TreeNode) Store.GetNode (args.Path);
+			n.PopulateChildrenAsync ();
+		};
+	}
+
 	public void PopulateChildrenData ()
 	{
 		if (Children != null || NodeXmlSrc == null)
@@ -167,7 +176,7 @@ public class TreeNode : Gtk.TreeNode {
 	}
 	
 	bool populating;
-	public void PopulateChildrenAsync ()
+	void PopulateChildrenAsync ()
 	{
 		// Fastpath filled ones
 		if (Children != null || NodeXmlSrc == null)
