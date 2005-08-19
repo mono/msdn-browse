@@ -166,11 +166,20 @@ public class TreeNode : Gtk.TreeNode {
 		Children = n.Children;
 	}
 	
+	bool populating;
 	public void PopulateChildrenAsync ()
 	{
 		// Fastpath filled ones
 		if (Children != null || NodeXmlSrc == null)
 			return;
+
+		// Prevent race conditions. We don't need a CAS here
+		// because the population can only start from one
+		// thread. The issue is that this can be re-entered
+		// before we are done populating.
+		if (populating)
+			return;
+		populating = true;
 
 		ThreadPool.QueueUserWorkItem (delegate {
 			PopulateChildrenData ();
