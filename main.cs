@@ -51,7 +51,7 @@ class MsdnView : Window {
   <frame src='" + n.Href + @"?frame=true' />
 </frameset>";
 			
-			wc.OpenStream (MsdnClient.MsdnBase, "text/html");
+			wc.OpenStream (MsdnClient.BaseUrl, "text/html");
 			wc.AppendData (html);
 			wc.CloseStream ();
 
@@ -87,7 +87,23 @@ static class MsdnClient {
 	static readonly XmlSerializer tree_ser = serializers [0];
 	static readonly XmlSerializer node_ser = serializers [1];
 
-	public const string MsdnBase = "http://msdn.microsoft.com";
+#if USE_WHIDBEY
+	// This is used by the dexplore.exe browser in whidbey beta
+	// 2. however, it seems to be extremely broken. Maybe they
+	// will fix it by RTM ;-).
+	public const string BaseUrl = "http://whidbey.msdn.microsoft.com";
+	public const string TopXml = "/library/en-us/toc/msdnlibWhidbeytest/top.xml";
+#elif USE_WINFX
+	// Avalon, Indigo, Longhorn (or whatever lame names they got)'
+	// Sadly, because msft does not like to program for firefox,
+	// these don't actually do too much :-(. 
+	public const string BaseUrl = "http://winfx.msdn.microsoft.com";
+	public const string TopXml = "/library/en-us/toc/winfxsdk/top.xml";
+#else 
+	// Standard msdn
+	public const string BaseUrl = "http://msdn.microsoft.com";
+	public const string TopXml = "/library/en-us/toc/msdnlib/top.xml";
+#endif
 
 	public static Stream OpenRead (string s)
 	{
@@ -95,7 +111,7 @@ static class MsdnClient {
 		// Thread.Sleep (1000);
 
 		WebClient wc = new WebClient ();
-		wc.BaseAddress = MsdnBase;
+		wc.BaseAddress = BaseUrl;
 		return wc.OpenRead (s);
 	}
 
@@ -119,7 +135,7 @@ public class DummyNode : TreeNode {
 public class Tree : TreeNode {
 	public static Tree GetDefault ()
 	{
-		return MsdnClient.OpenTree ("/library/en-us/toc/msdnlib/top.xml");
+		return MsdnClient.OpenTree (MsdnClient.TopXml);
 	}
 }
 
