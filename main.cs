@@ -51,13 +51,15 @@ class MsdnView : Window {
   <frame src='" + n.Href + @"?frame=true' />
 </frameset>";
 			
-			wc.OpenStream ("http://msdn.microsoft.com/", "text/html");
+			wc.OpenStream (MsdnClient.MsdnBase, "text/html");
 			wc.AppendData (html);
 			wc.CloseStream ();
 
 		};
-
-		Store.ConnectLazyLoad (view);
+		view.RowExpanded += delegate (object o, RowExpandedArgs args) {
+			TreeNode n = (TreeNode) Store.GetNode (args.Path);
+			n.PopulateChildrenAsync ();
+		};
 	}
 
 	void InitTree ()
@@ -80,10 +82,12 @@ class MsdnView : Window {
 	}
 }
 
-class MsdnClient {
+static class MsdnClient {
 	static readonly XmlSerializer [] serializers = XmlSerializer.FromTypes (new Type [] {typeof (Tree), typeof (TreeNode)});
 	static readonly XmlSerializer tree_ser = serializers [0];
 	static readonly XmlSerializer node_ser = serializers [1];
+
+	public const string MsdnBase = "http://msdn.microsoft.com";
 
 	public static Stream OpenRead (string s)
 	{
@@ -91,7 +95,7 @@ class MsdnClient {
 		// Thread.Sleep (1000);
 
 		WebClient wc = new WebClient ();
-		wc.BaseAddress = "http://msdn.microsoft.com";
+		wc.BaseAddress = MsdnBase;
 		return wc.OpenRead (s);
 	}
 
@@ -152,14 +156,6 @@ public class TreeNode : Gtk.TreeNode {
 		}
 	}
 
-	public void ConnectLazyLoad (NodeView nv)
-	{
-		nv.RowExpanded += delegate (object o, RowExpandedArgs args) {
-			TreeNode n = (TreeNode) Store.GetNode (args.Path);
-			n.PopulateChildrenAsync ();
-		};
-	}
-
 	public void PopulateChildrenData ()
 	{
 		if (Children != null || NodeXmlSrc == null)
@@ -176,7 +172,7 @@ public class TreeNode : Gtk.TreeNode {
 	}
 	
 	bool populating;
-	void PopulateChildrenAsync ()
+	public void PopulateChildrenAsync ()
 	{
 		// Fastpath filled ones
 		if (Children != null || NodeXmlSrc == null)
