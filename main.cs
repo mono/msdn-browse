@@ -58,12 +58,8 @@ class MsdnView : Window {
 		};
 	
 		view.RowExpanded += delegate (object o, RowExpandedArgs args) {
-			while (Application.EventsPending ())
-				Application.RunIteration ();
-			// Pretend you are using a 56k connection ;-)
-			// Thread.Sleep (1000);
 			TreeNode n = (TreeNode) Store.GetNode (args.Path);
-			n.PopulateChildren ();
+			n.PopulateChildrenAsync ();
 		};
 	}
 
@@ -94,6 +90,9 @@ class MsdnClient {
 
 	public static Stream OpenRead (string s)
 	{
+		// Pretend you are using a 56k connection ;-)
+		// Thread.Sleep (1000);
+
 		WebClient wc = new WebClient ();
 		wc.BaseAddress = "http://msdn.microsoft.com";
 		return wc.OpenRead (s);
@@ -152,13 +151,11 @@ public class TreeNode : Gtk.TreeNode {
 		}
 	}
 
-	public void PopulateChildren ()
+	public void PopulateChildrenData ()
 	{
-		if (Children != null)
+		if (Children != null || NodeXmlSrc == null)
 			return;
-		if (NodeXmlSrc == null)
-			return;
-
+		
 		TreeNode n;
 		if (this is Tree)
 			// I've never seen this, but just in case...
@@ -167,10 +164,22 @@ public class TreeNode : Gtk.TreeNode {
 			n = MsdnClient.OpenTreeNode (NodeXmlSrc);
 		
 		Children = n.Children;
-		SoftPopulate ();
-		
-		if (this [0] is DummyNode)
-			this.RemoveChild (this [0] as DummyNode);
+	}
+	
+	public void PopulateChildrenAsync ()
+	{
+		// Fastpath filled ones
+		if (Children != null || NodeXmlSrc == null)
+			return;
+
+		ThreadPool.QueueUserWorkItem (delegate {
+			PopulateChildrenData ();
+			
+			GLib.Idle.Add (delegate {
+				SoftPopulate ();
+				return false;
+			});
+		});
 	}
 
 	public void SoftPopulate ()
@@ -179,6 +188,10 @@ public class TreeNode : Gtk.TreeNode {
 			AddChild (c);
 			c.EnsureNoFakeLeafs ();
 		}
+	
+		if (this [0] is DummyNode)
+			this.RemoveChild (this [0] as DummyNode);
+
 	}
 
 	public void EnsureNoFakeLeafs () 
@@ -206,7 +219,7 @@ public class TreeNode : Gtk.TreeNode {
 				// included in the xml, so I am not
 				// sure if the populaltion is
 				// necessary. But let's be safe
-				n.PopulateChildren ();
+				n.PopulateChildrenData ();
 				DoFlatten (ar, n.Children);
 			} else
 				ar.Add (n);
