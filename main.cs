@@ -38,10 +38,10 @@ class MsdnView : Window {
 		};
 
 		view.NodeSelection.Changed += delegate (object o, EventArgs args) {
-			ITreeNode [] s = view.NodeSelection.SelectedNodes;
-			if (s.Length == 0)
+			TreeNode n = (TreeNode) view.NodeSelection.SelectedNode;
+			if (n == null)
 				return;
-			TreeNode n = (TreeNode) s [0];
+			
 			//
 			// Fool msdn's code that tries to detect if it
 			// is in a frame
