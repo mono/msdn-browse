@@ -1,5 +1,9 @@
 2005-09-02  Ben Maurer  <bmaurer@ximian.com>
 
+	* main.cs: TreeNodeValue works on fields yay.
+
+2005-09-02  Ben Maurer  <bmaurer@ximian.com>
+
 	* main.cs: Use my new nodestore helper api
 
 2005-08-19  Ben Maurer  <bmaurer@novell.com>

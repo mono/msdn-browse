@@ -146,10 +146,7 @@ public class TreeNode : Gtk.TreeNode {
 	
 	[XmlAttribute]
 	[TreeNodeValue (Column=0)]
-	public string Title {
-		get { return title; }
-		set { title = value; }
-	}
+	public string Title;
 	
 	[XmlAttribute]
 	public string Href;
