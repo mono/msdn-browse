@@ -142,8 +142,7 @@ public class Tree : TreeNode {
 public class TreeNode : Gtk.TreeNode {
 	[XmlAttribute]
 	public string NodeId;
-	string title;
-	
+
 	[XmlAttribute]
 	[TreeNodeValue (Column=0)]
 	public string Title;
