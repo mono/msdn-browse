@@ -1,7 +1,3 @@
-2005-09-03  Ben Maurer  <bmaurer@ximian.com>
-
-	* main.cs: Clean up a bit
-
 2005-09-02  Ben Maurer  <bmaurer@ximian.com>
 
 	* main.cs: TreeNodeValue works on fields yay.

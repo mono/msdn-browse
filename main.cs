@@ -154,8 +154,17 @@ public class TreeNode : Gtk.TreeNode {
 	[XmlAttribute]
 	public string NodeXmlSrc;
     
+	TreeNode [] children;
+
 	[XmlElement ("TreeNode"), XmlElement ("Tree", typeof (Tree))]
-	public TreeNode [] Children;
+	public TreeNode [] Children {
+		get {
+			return children;
+		}
+		set {
+			children = Flatten (value);
+		}
+	}
 
 	public void PopulateChildrenData ()
 	{
@@ -169,7 +178,7 @@ public class TreeNode : Gtk.TreeNode {
 		else
 			n = MsdnClient.OpenTreeNode (NodeXmlSrc);
 		
-		Children = Flatten (n.Children);
+		Children = n.Children;
 	}
 	
 	bool populating;
