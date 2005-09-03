@@ -1,12 +1,12 @@
 using System;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Net;
-using Gtk;
 using System.Collections;
-using Gecko;
+using System.IO;
+using System.Net;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml;
+using Gtk;
+using Gecko;
 
 class MsdnView : Window {
 	NodeStore Store;
@@ -201,9 +201,8 @@ public class TreeNode : Gtk.TreeNode {
 		ThreadPool.QueueUserWorkItem (delegate {
 			PopulateChildrenData ();
 			
-			GLib.Idle.Add (delegate {
+			Application.Invoke (delegate {
 				SoftPopulate ();
-				return false;
 			});
 		});
 	}
