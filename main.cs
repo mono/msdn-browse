@@ -37,7 +37,7 @@ class MsdnView : Window {
 			Application.Quit ();
 		};
 
-		view.NodeSelection.Changed += delegate (object o, EventArgs args) {
+		view.NodeSelection.Changed += delegate {
 			TreeNode n = (TreeNode) view.NodeSelection.SelectedNode;
 			if (n == null)
 				return;
