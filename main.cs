@@ -162,7 +162,26 @@ public class TreeNode : Gtk.TreeNode {
 			return children;
 		}
 		set {
-			children = Flatten (value);
+			if (value == null)
+				return;
+			ArrayList ar = new ArrayList (value.Length);
+			Flatten (ar, value);
+			children = (TreeNode []) ar.ToArray (typeof (TreeNode));
+		}
+	}
+	
+	static void Flatten (ArrayList ar, TreeNode [] nodes)
+	{
+		foreach (TreeNode n in nodes) {
+			if (n is Tree) {
+				// Trees always seem to have nodes
+				// included in the xml, so I am not
+				// sure if the populaltion is
+				// necessary. But let's be safe
+				n.PopulateChildrenData ();
+				Flatten (ar, n.Children);
+			} else
+				ar.Add (n);
 		}
 	}
 
@@ -217,30 +236,6 @@ public class TreeNode : Gtk.TreeNode {
 				this.RemoveChild (this [0] as DummyNode);
 		} else if (NodeXmlSrc != null && ChildCount == 0)
 			AddChild (new DummyNode ());
-	}
-
-	static TreeNode [] Flatten (TreeNode [] nodes)
-	{
-		if (nodes == null)
-			return null;
-		ArrayList ar = new ArrayList (nodes.Length);
-		DoFlatten (ar, nodes);
-		return (TreeNode []) ar.ToArray (typeof (TreeNode));
-	}
-
-	static void DoFlatten (ArrayList ar, TreeNode [] nodes)
-	{
-		foreach (TreeNode n in nodes) {
-			if (n is Tree) {
-				// Trees always seem to have nodes
-				// included in the xml, so I am not
-				// sure if the populaltion is
-				// necessary. But let's be safe
-				n.PopulateChildrenData ();
-				DoFlatten (ar, n.Children);
-			} else
-				ar.Add (n);
-		}
 	}
     
 	public override string ToString ()
