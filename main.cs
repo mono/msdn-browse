@@ -10,9 +10,7 @@ using Gecko;
 
 class MsdnView : Window {
 	NodeStore Store;
-	WebControl wc;
-
-
+	
 	public MsdnView () : base ("Msdn View")
 	{	
 		DefaultSize = new Gdk.Size (1024,1024);
@@ -20,7 +18,7 @@ class MsdnView : Window {
 		HPaned hb = new HPaned ();
 	
 		Store = new NodeStore (typeof (TreeNode));
-		wc = new WebControl ();
+		WebControl wc = new WebControl ();
 		ScrolledWindow sw = new ScrolledWindow ();
 		NodeView view = new NodeView (Store);	
 		view.HeadersVisible = false;
