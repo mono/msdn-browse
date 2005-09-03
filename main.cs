@@ -66,7 +66,7 @@ class MsdnView : Window {
 		
 		foreach (TreeNode n in t.Children) {
 			Store.AddNode (n);
-			n.EnsureNoFakeLeafs ();
+			n.PopulateGuiChildren ();
 		}
 	}
 
@@ -200,28 +200,22 @@ public class TreeNode : Gtk.TreeNode {
 			PopulateChildrenData ();
 			
 			Application.Invoke (delegate {
-				SoftPopulate ();
+				PopulateGuiChildren ();
 			});
 		});
 	}
-
-	public void SoftPopulate ()
-	{
-		foreach (TreeNode c in Children) {
-			AddChild (c);
-			c.EnsureNoFakeLeafs ();
-		}
 	
-		if (this [0] is DummyNode)
-			this.RemoveChild (this [0] as DummyNode);
-
-	}
-
-	public void EnsureNoFakeLeafs () 
+	public void PopulateGuiChildren () 
 	{
-		if (Children != null)
-			SoftPopulate ();
-		else if (NodeXmlSrc != null && ChildCount == 0)
+		if (Children != null) {
+			foreach (TreeNode c in Children) {
+				AddChild (c);
+				c.PopulateGuiChildren ();
+			}
+	
+			if (this [0] is DummyNode)
+				this.RemoveChild (this [0] as DummyNode);
+		} else if (NodeXmlSrc != null && ChildCount == 0)
 			AddChild (new DummyNode ());
 	}
 
