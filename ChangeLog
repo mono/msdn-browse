@@ -1,3 +1,7 @@
+2006-05-02  Zac Bowling <zac@zacbowling.com>
+
+	* msdnb: Invoke wrapper that find libgtkmozembed.so
+
 2005-09-02  Ben Maurer  <bmaurer@ximian.com>
 
 	* main.cs: TreeNodeValue works on fields yay.
